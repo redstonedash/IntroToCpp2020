@@ -42,9 +42,34 @@ void GoToXY(int column, int line)
 		// ...
 	}
 }
-void turn(char &winner, int x, int y) {
+void endGame() {
 
 }
+void turn(char &winner, int x, int y, int board[3][3]) {
+
+}
+bool update(int board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD, bool &keyW)
+{
+
+	std::cout << "\b \b";
+	if ((GetKeyState('A') & 0x8000) && !keyA) { keyA = true; x--; }
+	if ((GetKeyState('S') & 0x8000) && !keyA) { keyS = true; y++; }
+	if ((GetKeyState('D') & 0x8000) && !keyA) { keyD = true; x++; }
+	if ((GetKeyState('W') & 0x8000) && !keyA) { keyW = true; y--; }
+/////////////////////////////////////////////////////////////////////////////
+	if (!GetKeyState('A') & 0x8000) keyA = false;
+	if (!GetKeyState('S') & 0x8000) keyS = false;
+	if (!GetKeyState('D') & 0x8000) keyD = false;
+	if (!GetKeyState('W') & 0x8000) keyW = false;
+	if (GetKeyState('\x0D') & 0x8000) return false;
+	if (GetKeyState('\x1B') & 0x8000) return false;
+	GoToXY(x%3*3, y%3+2);
+	std::cout << "#";
+	return true;
+}
+
+
+
 int main() {
 	/*while(true){
 		std::cout << ">";
@@ -74,7 +99,7 @@ int main() {
 	int y = 0;
 	int board[3][3] = { 0,0,0,0,0,0,0,0,0 };
 	std::cout <<
-		"This is Tic Tak Toe"
+		"This is Tic Tak Toe\n"
 		"Current Turn: ";
 	CONSOLE_SCREEN_BUFFER_INFO cbsi;
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cbsi);
@@ -82,17 +107,10 @@ int main() {
 	int turnScreenPosY = cbsi.dwCursorPosition.Y;
 	std::cout << "X";
 	std::cout << "\n[ ][ ][ ]\n[ ][ ][ ]\n[ ][ ][ ]\n";
-	while (true) {
-		std::cout << "\b \b";
-		if (GetKeyState('A') & 0x8000) x--;
-		if (GetKeyState('S') & 0x8000) y++;
-		if (GetKeyState('D') & 0x8000) x++;
-		if (GetKeyState('W') & 0x8000) y--;
-		if (GetKeyState('\x0D') & 0x8000) return 0;
-		if (GetKeyState('\x1B') & 0x8000) return 0;
-		GoToXY(x, y);
-		std::cout << "#";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+	bool keyA, keyS, keyD, keyW;
+	keyA = keyS = keyD = keyW = false;
+	while (update(board, x, y, keyA, keyS, keyD, keyW)) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 	}
 	return 0;
 
