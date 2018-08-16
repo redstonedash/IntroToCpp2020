@@ -72,6 +72,7 @@ int main() {
 	std::cout << "b: " << b << "\n";*/
 	int x = 0;
 	int y = 0;
+	int board[3][3] = { 0,0,0,0,0,0,0,0,0 };
 	std::cout <<
 		"This is Tic Tak Toe"
 		"Current Turn: ";
