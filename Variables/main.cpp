@@ -45,26 +45,37 @@ void GoToXY(int column, int line)
 void endGame() {
 
 }
-void turn(char &winner, int x, int y, int board[3][3]) {
+void turn(char &winner, int x, int y, char board[3][3]) {
 
 }
-bool update(int board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD, bool &keyW)
+bool update(char board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD, bool &keyW)
 {
-
-	std::cout << "\b \b";
-	if ((GetKeyState('A') & 0x8000) && !keyA) { keyA = true; x--; }
-	if ((GetKeyState('S') & 0x8000) && !keyA) { keyS = true; y++; }
-	if ((GetKeyState('D') & 0x8000) && !keyA) { keyD = true; x++; }
-	if ((GetKeyState('W') & 0x8000) && !keyA) { keyW = true; y--; }
+	bool isAnyKey = false;
+	int tempX = x;
+	int tempY = y;
+	if ((GetKeyState('A') & 0x8000) && !keyA) { keyA = true; x--; isAnyKey = true; }
+	if ((GetKeyState('S') & 0x8000) && !keyS) { keyS = true; y++; isAnyKey = true; }
+	if ((GetKeyState('D') & 0x8000) && !keyD) { keyD = true; x++; isAnyKey = true; }
+	if ((GetKeyState('W') & 0x8000) && !keyW) { keyW = true; y--; isAnyKey = true; }
+	if (isAnyKey) {
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x07);
+		std::cout << "[" << board[tempX][tempY] << "]";
+	}
 /////////////////////////////////////////////////////////////////////////////
-	if (!GetKeyState('A') & 0x8000) keyA = false;
-	if (!GetKeyState('S') & 0x8000) keyS = false;
-	if (!GetKeyState('D') & 0x8000) keyD = false;
-	if (!GetKeyState('W') & 0x8000) keyW = false;
+	if (!(GetKeyState('A') & 0x8000)) keyA = false;
+	if (!(GetKeyState('S') & 0x8000)) keyS = false;
+	if (!(GetKeyState('D') & 0x8000)) keyD = false;
+	if (!(GetKeyState('W') & 0x8000)) keyW = false;
 	if (GetKeyState('\x0D') & 0x8000) return false;
 	if (GetKeyState('\x1B') & 0x8000) return false;
-	GoToXY(x%3*3, y%3+2);
-	std::cout << "#";
+	if (x > 2) x = 0;
+	if (x < 0) x = 2;
+	if (y > 2) y = 0;
+	if (y < 0) y = 2;
+	GoToXY(x*3, y+2);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x70);
+	std::cout << "[" << board[x][y] << "]\b\b\b";
+
 	return true;
 }
 
@@ -97,7 +108,7 @@ int main() {
 	std::cout << "b: " << b << "\n";*/
 	int x = 0;
 	int y = 0;
-	int board[3][3] = { 0,0,0,0,0,0,0,0,0 };
+	char board[3][3] = { ' ',' ',' ',' ',' ',' ',' ',' ',' ' };
 	std::cout <<
 		"This is Tic Tak Toe\n"
 		"Current Turn: ";
