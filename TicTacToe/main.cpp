@@ -20,6 +20,7 @@ void AreaOfRectangle() {
 
 }
 */
+char playerTurn = 'X';
 void GoToXY(int column, int line)
 {
 	// Create a COORD structure and fill in its members.
@@ -42,9 +43,16 @@ void GoToXY(int column, int line)
 		// ...
 	}
 }
-void endGame(int con) { //con = 0 = tie, con = 1 = x wins, con = 2 = o wins;
+void endGame(int con) { //con = 0 = tie, con = 1 = current player wins;
 	GoToXY(0, 1);
-	std::cout << "GAME OVER: TIE                              ";
+	switch (con) {
+	case 0:
+		std::cout << "GAME OVER: CATS GAME                              ";
+		break;
+	case 1:
+		std::cout << "GAME OVER: " << playerTurn << " WINS                                 ";
+		break;
+	}
 }
 bool rowCheck(int row, char board[3][3]) {
 	if (board[row][1] != ' ' &&
@@ -94,7 +102,7 @@ bool turn(int x, int y, char board[3][3]) {
 	if (board[x][y] != ' ') { return false; }
 	board[x][y] = 'X';
 	if (checkGame(board, x, y)) return true;
-	return AI(board);
+	return false;
 }
 
 bool update(char board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD, bool &keyW)
@@ -110,7 +118,6 @@ bool update(char board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD
 
 	if (isAnyKey) {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x07);
-		GoToXY(tempX * 3, tempY + 2);
 		std::cout << "[" << board[tempX][tempY] << "]";
 	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +184,13 @@ int main() {
 	bool keyA, keyS, keyD, keyW;
 	keyA = keyS = keyD = keyW = false;
 	while (update(board, x, y, keyA, keyS, keyD, keyW)) {
+		if (playerTurn == 'X') {
+			GoToXY(turnScreenPosX, turnScreenPosY);
+			std::cout << "X";
+		} else {
+			GoToXY(turnScreenPosX, turnScreenPosY);
+			std::cout << "Y";
+		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 	}
 	while (!(GetKeyState('\x1B') & 0x8000))std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
