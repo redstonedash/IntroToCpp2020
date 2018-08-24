@@ -36,8 +36,7 @@ void GoToXY(int column, int line)
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	// Finally, call the SetConsoleCursorPosition function.
-	if (!SetConsoleCursorPosition(hConsole, coord)) //TODO handel error
-	{
+	if (!SetConsoleCursorPosition(hConsole, coord)){ //TODO handel error
 		// Uh-oh! The function call failed, so you need to handle the error.
 		// You can call GetLastError() to get a more specific error code.
 		// ...
@@ -79,17 +78,17 @@ bool centerCheck(char board[3][3]) {
 }
 bool checkGame(char board[3][3], int x, int y) { //returns true when game is over
 	if (x + y == 1 || x + y == 3) { //edge
-		if (rowCheck(x, board))return true;
-		if (collumCheck(y, board))return true;
+		if (rowCheck(x, board)) { endGame(1); return true; }
+		if (collumCheck(y, board)) { endGame(1); return true; }
 		return false;
 	}
 	// middle && corners
-	if (rowCheck(x, board))return true;
-	if (collumCheck(y, board))return true;
-	if (centerCheck(board))return true;
+	if (rowCheck(x, board))    { endGame(1); return true; }
+	if (collumCheck(y, board)) { endGame(1); return true; }
+	if (centerCheck(board))    { endGame(1); return true; }
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			if (board[i][j] != ' ') {
+			if (board[i][j] == ' ') {
 				return false;
 			}
 		}
@@ -100,8 +99,13 @@ bool checkGame(char board[3][3], int x, int y) { //returns true when game is ove
 
 bool turn(int x, int y, char board[3][3]) {
 	if (board[x][y] != ' ') { return false; }
-	board[x][y] = 'X';
+	board[x][y] = playerTurn;
 	if (checkGame(board, x, y)) return true;
+	if (playerTurn == 'X') {
+		playerTurn = 'O';
+	} else {
+		playerTurn = 'X';
+	}
 	return false;
 }
 
@@ -117,6 +121,7 @@ bool update(char board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD
 	if ((GetKeyState('W') & 0x8000) && !keyW) { keyW = true; y--; isAnyKey = true; }
 
 	if (isAnyKey) {
+		GoToXY(tempX * 3, tempY + 2);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x07);
 		std::cout << "[" << board[tempX][tempY] << "]";
 	}
@@ -141,8 +146,6 @@ bool update(char board[3][3], int &x, int &y, bool &keyA, bool &keyS, bool &keyD
 
 	return gameRunning;
 }
-
-
 
 int main() {
 	/*while(true){
@@ -189,7 +192,7 @@ int main() {
 			std::cout << "X";
 		} else {
 			GoToXY(turnScreenPosX, turnScreenPosY);
-			std::cout << "Y";
+			std::cout << "O";
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 	}
